@@ -1,0 +1,8 @@
+build
+dist
+data
+development.ini
+*.egg-info
+*.pyc
+*.swp
+*.egg
