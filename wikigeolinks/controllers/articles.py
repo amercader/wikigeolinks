@@ -10,6 +10,18 @@ from mapfish.decorators import geojsonify
 
 from geojson import FeatureCollection
 
+def _get_article(id, session = Session):
+    article = None
+    try:
+        id = abs(int(id))
+        if id > 2147483647:
+            raise ValueError
+        article = session.query(Article).get(id)
+    except ValueError,e:
+        article = session.query(Article) \
+                .filter(Article.title==unicode(id)) \
+                .first()
+    return article
 
 
 class CustomProtocol(Protocol):
@@ -19,7 +31,7 @@ class CustomProtocol(Protocol):
         to the database, and return a Feature or a FeatureCollection. """
         ret = None
         if id is not None:
-            o = self.Session.query(self.mapped_class).get(id)
+            o = _get_article(id,session = self.Session)
             if o is None:
                 abort(404)
             ret = self._filter_attrs(o.toFeature(), request)
@@ -42,13 +54,14 @@ class ArticlesController(BaseController):
     def __init__(self):
         self.protocol = CustomProtocol(Session, Article, self.readonly)
 
+
     @geojsonify
     def index(self, format='json'):
         """GET /: return all features."""
         # If no filter argument is passed to the protocol index method
         # then the default MapFish filter is used.
         #
-        # If you need your own filter with application-specific params 
+        # If you need your own filter with application-specific params
         # taken into acount, create your own filter and pass it to the
         # protocol read method.
         #
@@ -90,16 +103,18 @@ class ArticlesController(BaseController):
     def count(self):
         """GET /count: Count all features."""
         return self.protocol.count(request)
-    
+
     @geojsonify
     def get_linked(self,id):
-
-        article = Session.query(Article).filter(Article.id == id).first()
+        article = _get_article(id)
+        if article is None:
+            abort(404)
         linked_articles = article.get_linked_articles(as_features = True)
         return  linked_articles
 
     def get_links_count(self,id):
-
-        article = Session.query(Article).filter(Article.id == id).first()
+        article = _get_article(id)
+        if article is None:
+            abort(404)
         linked_articles = article.get_linked_articles()
         return  str(len(linked_articles))

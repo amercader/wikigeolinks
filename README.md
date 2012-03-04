@@ -54,11 +54,12 @@ API Overview
 
 Georeferenced articles are returned as GeoJSON [Features](http://geojson.org/geojson-spec.html#feature-objects):
 
-    GET http://<server>/articles/<id>
+    GET http://<server>/articles/<id_or_title>
 
 E.g.:
 
     GET http://<server>/articles/1234
+    GET http://<server>/articles/United%20States%20Naval%20Observatory
 
     {
         geometry: {
@@ -81,6 +82,8 @@ E.g.:
             title: "United States Naval Observatory"
         }
     }
+
+You can use both the numeric id or the article title as indentifiers.
 
 You can perform various queries using the [MapFish Protocol](http://trac.mapfish.org/trac/mapfish/wiki/MapFishProtocol)
 on the main endpoint:
