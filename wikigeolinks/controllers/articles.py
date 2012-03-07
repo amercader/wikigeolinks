@@ -6,7 +6,10 @@ from wikigeolinks.model.articles import Article
 from wikigeolinks.model.meta import Session
 
 from mapfish.protocol import Protocol, create_default_filter
-from mapfish.decorators import geojsonify
+from mapfish.decorators import MapFishEncoder, _jsonify
+
+geojsonify = _jsonify(cb="callback", cls=MapFishEncoder)
+
 
 from geojson import FeatureCollection
 
